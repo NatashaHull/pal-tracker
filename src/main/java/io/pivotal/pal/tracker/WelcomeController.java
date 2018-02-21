@@ -10,4 +10,9 @@ public class WelcomeController {
     public String sayHello() {
         return "hello";
     }
+
+    @GetMapping("/test")
+    public String sayTest() {
+        return "<html><body><button type='button'>Click Me!</button></body></html>";
+    }
 }
