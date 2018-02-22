@@ -60,6 +60,7 @@ jobs:
 - name: deploy-review
   plan:
   - get: pal-tracker
+    passed: [build]
   - get: pal-tracker-artifacts
     trigger: true
     passed: [build]
@@ -69,10 +70,23 @@ jobs:
       path: pal-tracker-artifacts/pal-tracker-*.jar
       environment_variables:
         WELCOME_MESSAGE: "Hello from the review environment"
+  - task: migrate database
+    file: pal-tracker/ci/migrateDatabase.yml
+    params:
+      CF_API_URL: {{cf-api-url}}
+      CF_USERNAME: {{cf-username}}
+      CF_PASSWORD: {{cf-password}}
+      CF_ORG: {{cf-org}}
+      CF_SPACE: review
+      MYSQL_IP: {{mysql-ip}}
+      DATABASE_NAME: {{review-database-name}}
+      DATABASE_USERNAME: {{review-database-username}}
+      DATABASE_PASSWORD: {{review-database-password}}
 
 - name: deploy-production
   plan:
   - get: pal-tracker
+    passed: [deploy-review]
   - get: pal-tracker-artifacts
     passed: [deploy-review]
   - put: production-deployment
@@ -81,3 +95,15 @@ jobs:
       path: pal-tracker-artifacts/pal-tracker-*.jar
       environment_variables:
         WELCOME_MESSAGE: "Hello from the production environment"
+  - task: migrate database
+    file: pal-tracker/ci/migrateDatabase.yml
+    params:
+      CF_API_URL: {{cf-api-url}}
+      CF_USERNAME: {{cf-username}}
+      CF_PASSWORD: {{cf-password}}
+      CF_ORG: {{cf-org}}
+      CF_SPACE: production
+      MYSQL_IP: {{mysql-ip}}
+      DATABASE_NAME: {{production-database-name}}
+      DATABASE_USERNAME: {{production-database-username}}
+      DATABASE_PASSWORD: {{production-database-password}}
