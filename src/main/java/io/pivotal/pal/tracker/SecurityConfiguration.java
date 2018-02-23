@@ -8,22 +8,19 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-
     @Override
-    public void configure(HttpSecurity http) throws Exception {
+    protected void configure(HttpSecurity http) throws Exception {
         String forceHttps = System.getenv("SECURITY_FORCE_HTTPS");
         if (forceHttps != null && forceHttps.equals("true")) {
             http.requiresChannel().anyRequest().requiresSecure();
         }
+
         http
-                .authorizeRequests()
-                .antMatchers("/**")
-                .hasRole("USER")
+                .authorizeRequests().antMatchers("/**").hasRole("USER")
                 .and()
                 .httpBasic()
                 .and()
-                .csrf()
-                .disable();
+                .csrf().disable();
     }
 
     @Autowired
@@ -32,5 +29,3 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .inMemoryAuthentication()
                 .withUser("user").password("password").roles("USER");
     }
-
-}
