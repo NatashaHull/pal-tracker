@@ -43,6 +43,7 @@ public class TimeEntryApiTest {
         jdbcTemplate.execute("TRUNCATE time_entries");
 
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        restTemplate = restTemplate.withBasicAuth("user", "password");
     }
 
     @Test
